@@ -11,19 +11,24 @@
 // Opérations sur les... opérations
 bool ajouter_operation(Operation op, sqlite3 *bdd){ // Penser à cast time_t à long long int
 
-	// free opeerartion
+			
+
+	// free opeerartion ? en sortant du menu free la liste chaînée
 }
 
 Operation *recup_operations(int compte_id, sqlite3 *bdd) {
 
 	sqlite3_stmt *stmt;
-	Operation *op_origine, *op;
+	Operation *op_origine, *op; // Opération d'origine qui sera renvoyée par la fonction, base de la liste chaînée, et opération courante qui sera remplie contigüe à la précédente
 	
+	// Préparation de la requête
 	sqlite3_prepare_v2(bdd, "SELECT * FROM comptes WHERE operation_expediteur = ? OR operation_destinaire ?	ORDER BY operation_date", -1, &stmt, NULL);
-	
 	sqlite3_bind_int(stmt, 1, compte_id);
 	sqlite3_bind_int(stmt, 2, compte_id);
-	if(sqlite3_step(stmt) == SQLITE_DONE) return NULL; // On remplit la première opération celle qu'on retournera (à moins qu'il n'y en ait pas auquel cas on retourne NULL)
+
+	// Exécution de la requête : première ligne
+	// S'il n'y a pas d'opérations pour ce compte, on retourne directement NULL. Sinon, on définit l'opération d'origine qui sera retournée de toutes façons et on base l'opération courante dessus
+	if(sqlite3_step(stmt) == SQLITE_DONE) return NULL; 
 	else {
 		op_origine = malloc(sizeof(Operation));
 		op = op_origine;
@@ -35,6 +40,8 @@ Operation *recup_operations(int compte_id, sqlite3 *bdd) {
 		op_origine->operation_destinataire = sqlite3_column_int(stmt,4);
 		op_origine->suivante = NULL; // Défini à NULL au cas où on rentre pas dans la boucle d'après
 	}
+	// Exécution de la requête : suite
+	// On continue à descendre dans le tableau en allouant et liant le prochain noeud à l'opération courante, puis on passe à ce noeud et on le remplit
 	while(sqlite3_step(stmt) != SQLITE_DONE) {
 		op->suivante = malloc(sizeof(Operation)); // op et op_origine pointent tous deux sur le même objet à la première itération. Donc en assignant ici on change aussi op_origine->suivant
 		op = op->suivante;
@@ -47,6 +54,8 @@ Operation *recup_operations(int compte_id, sqlite3 *bdd) {
 		op->suivante = NULL; // Défini à NULL au cas où on rentre pas dans la boucle d'après
 	}
 
+	sqlite3_finalize(stmt);
+	
 	return op_origine; // On retourne un pointeur sur l'opération d'origine grâce à laquelle on pourra parcourir la liste chaînée
 }
 
@@ -58,10 +67,21 @@ Operation *recup_operations(int compte_id, sqlite3 *bdd) {
 
 // Edition de compte
 bool ajouter_compte(Compte compte, sqlite3 *bdd){
+
+	sqlite3_stmt *stmt;
+	sqlite3_prepare_v2(bdd, "INSERT INTO comptes VALUES(NULL, ?, ?)", -1, &stmt, NULL);
+	sqlite3_bind_int(stmt, 1, compte.type);
+	sqlite3_bind_int(stmt, 2, PERMISSION_DECOUVERT_DEFAUT);
+	
+	int res = sqlite3_step(stmt);
+	sqlite3_finalize(stmt);
+
+	if(res != SQLITE_DONE) return -1;
+	else return 0;
 }
 bool modifier_compte(Compte compte, int id, sqlite3 *bdd){
 }
-bool ajouter_compte_titulaire(int compte_id, int titulaire_id, sqlite3 *bdd){
+bool ajouter_compte_titulaire(int compte_id, int titulaire_id, sqlite3 *bdd){ // Dans métier proposer ajout titulaires séparés par séparateur à la création TODO
 }
 bool enlever_compte_titulaire(int compte_id, int titulaire_id, sqlite3 *bdd){
 }
@@ -87,6 +107,7 @@ Compte *recup_compte(int compte_id, sqlite3 *bdd){
 		// Remplissage des titulaires du compte
 		compte->compte_titulaires = recup_titulaires(compte_id,bdd);
 	}
+	sqlite3_finalize(stmt);
 	return compte;
 }
 
@@ -110,6 +131,7 @@ int *recup_titulaires(int compte_id, sqlite3 *bdd) {
 		int i;
 		for(i = 0 ; sqlite3_step(stmt) != SQLITE_DONE ; i++) liste_titulaires[i] = sqlite3_column_int(stmt,1);
 	}
+	sqlite3_finalize(stmt);
 	return liste_titulaires;
 }
 // Pas de suppression titulaire (à moins que ? Juste le supprimer de tous ses comptes)
