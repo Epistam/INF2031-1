@@ -1,7 +1,7 @@
 # Generic vars & flags
 CC=gcc
 CFLAGS=-Wall -O2 #-fdiagnostics-color=always gcc >=4.9
-LDFLAGS=-lm
+LDFLAGS=-lm -lsqlite3
 EXEC=Banque
 SRC = $(filter-out test.c, $(wildcard *.c))
 #SRC=$(wildcard *.c)

@@ -1,0 +1,36 @@
+// Couche métier de l'application : prise en charge des fonctions proposées au client par l'interface, et appel aux fonctions de plus bas niveau
+// pour accéder aux données 
+#include <stdio.h>
+#include <stdlib.h>
+#include <sqlite3.h>
+#include "include/referentiel.h"
+#include "include/metier.h"
+
+// Ne consistent qu'en l'ajout d'une opération puisque les comptes n'ont pas de montant à proprement parler, mais se définissent par la suite des opérations effectuées
+bool echange_liquidites(int compte_id, double montant, int type){
+	Operation *op = malloc(sizeof(Operation));
+
+	// id autoincrement???
+	op->operation_type = 0;
+
+	op->date = malloc(LONGUEUR_DATE*sizeof(char));
+	// TODO get date
+	
+	op->expediteur = type ? 0 : compte_id; // Opération avec l'utilisateur 0 <=> crédit 
+	op->destinataire = type ? compte_id : 0;
+
+	op->montant = montant;
+
+	// Ecriture opération
+	if(ajouter_operation(op)) restaurer_bdd(); // Si retour différent de EXIT_SUCCESS = 0, on restaure l'ancienne db et on arrête le programme avec un msg d'erreur TODO
+
+	free(op->date);
+	free(op);
+
+}
+bool virement(int compte_id1, int compte_id2, double montant, sqlite3 bdd){
+	// Retrait compte_id1
+	// Crédit compte_id2
+	// Ajout opération à table opérations
+
+}
