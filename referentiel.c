@@ -10,7 +10,8 @@
  *****************************/
 // Opérations sur les... opérations
 bool ajouter_operation(Operation op, sqlite3 *bdd){ // Penser à cast time_t à long long int
-	
+
+	// free opeerartion
 }
 
 Operation *recup_operations(int compte_id, sqlite3 *bdd) {
@@ -29,7 +30,7 @@ Operation *recup_operations(int compte_id, sqlite3 *bdd) {
 
 		op_origine->operation_id = sqlite3_column_int(stmt,0);
 		op_origine->operation_type = sqlite3_column_int(stmt,1);
-		op_origine->operation_date = sqlite3_column_int(stmt,2);
+		op_origine->operation_date = (time_t)sqlite3_column_int(stmt,2);
 		op_origine->operation_expediteur = sqlite3_column_int(stmt,3);
 		op_origine->operation_destinataire = sqlite3_column_int(stmt,4);
 		op_origine->suivante = NULL; // Défini à NULL au cas où on rentre pas dans la boucle d'après

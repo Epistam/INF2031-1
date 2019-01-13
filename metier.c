@@ -28,7 +28,6 @@ bool echange_liquidites(int compte_id, double montant, int type, sqlite3 *bdd){
 	if(ajouter_operation(*op, bdd)) return 1; // Le nombre != EXIT_SUCCESS = 0 sera répercuté jusqu'en haut auquel cas on fermera la BDD, on la restaurera et on arrêtera le programme TODO
 
 	// Pas besoin d'inclure les free dans le if erreur, on ne risque pas le memory leak vu qu'on ne fera plus rien
-	free(op->operation_date);
 	free(op);
 	
 	return 0;
@@ -55,7 +54,6 @@ bool virement(int compte_id1, int compte_id2, double montant, sqlite3 *bdd){
 	if(ajouter_operation(*op, bdd)) return 1; 	
 	
 	// Pas besoin d'inclure les free dans le if erreur, on ne risque pas le memory leak vu qu'on ne fera plus rien
-	free(op->operation_date);
 	free(op);
 	
 	return 0;
