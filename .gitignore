@@ -1,6 +1,0 @@
-*.o
-*.swp
-.vim.session
-meta/*
-Banque
-a.out
