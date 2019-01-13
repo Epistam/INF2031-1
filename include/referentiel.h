@@ -4,7 +4,7 @@
 #define MAX_TITULAIRES 10
 #define LONGUEUR_DATE 19 // YYYY:MM:DD:HH:MM:SS
 #define FICHIER_BDD "banque_test_set.db"
-#define FICHIER_BDD "banque_vide.db"
+//#define FICHIER_BDD "banque_vide.db"
 #define PERMISSION_DECOUVERT_DEFAUT 0 // Non
 
 

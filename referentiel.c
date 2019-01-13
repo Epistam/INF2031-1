@@ -55,7 +55,6 @@ Operation *recup_operations(int compte_id, sqlite3 *bdd) {
 	}
 
 	sqlite3_finalize(stmt);
-	
 	return op_origine; // On retourne un pointeur sur l'opération d'origine grâce à laquelle on pourra parcourir la liste chaînée
 }
 
@@ -70,17 +69,32 @@ bool ajouter_compte(Compte compte, sqlite3 *bdd){
 
 	sqlite3_stmt *stmt;
 	sqlite3_prepare_v2(bdd, "INSERT INTO comptes VALUES(NULL, ?, ?)", -1, &stmt, NULL);
-	sqlite3_bind_int(stmt, 1, compte.type);
+	sqlite3_bind_int(stmt, 1, compte.compte_type);
 	sqlite3_bind_int(stmt, 2, PERMISSION_DECOUVERT_DEFAUT);
 	
 	int res = sqlite3_step(stmt);
+	
 	sqlite3_finalize(stmt);
-
 	if(res != SQLITE_DONE) return -1;
 	else return 0;
 }
+
 bool modifier_compte(Compte compte, int id, sqlite3 *bdd){
+	
+	sqlite3_stmt *stmt;
+
+	sqlite3_prepare_v2(bdd, "UPDATE comptes SET compte_type = ?, compte_decouvert_autorise = ? WHERE compte_id = ?", -1, &stmt, NULL);
+	sqlite3_bind_int(stmt, 1, compte.compte_type);
+	sqlite3_bind_int(stmt, 2, compte.compte_decouvert_autorise);
+	sqlite3_bind_int(stmt, 3, compte.compte_id);
+	
+	int res = sqlite3_step(stmt);
+
+	sqlite3_finalize(stmt);
+	if(res != SQLITE_DONE) return -1;
+	else return 0;
 }
+
 bool ajouter_compte_titulaire(int compte_id, int titulaire_id, sqlite3 *bdd){ // Dans métier proposer ajout titulaires séparés par séparateur à la création TODO
 }
 bool enlever_compte_titulaire(int compte_id, int titulaire_id, sqlite3 *bdd){
@@ -97,7 +111,7 @@ Compte *recup_compte(int compte_id, sqlite3 *bdd){
 		sqlite3_stmt *stmt;
 		sqlite3_prepare_v2(bdd, "SELECT * FROM comptes WHERE id = ?", -1, &stmt, NULL);
 		sqlite3_bind_int(stmt, 1, compte_id);
-		sqlite3_step(stmt);
+		sqlite3_step(stmt); // ids uniques
 	
 		// On remplit les différents champs de compte
 		compte->compte_id = sqlite3_column_int(stmt,0);
@@ -106,8 +120,9 @@ Compte *recup_compte(int compte_id, sqlite3 *bdd){
 
 		// Remplissage des titulaires du compte
 		compte->compte_titulaires = recup_titulaires(compte_id,bdd);
+		sqlite3_finalize(stmt);
 	}
-	sqlite3_finalize(stmt);
+
 	return compte;
 }
 
@@ -130,8 +145,8 @@ int *recup_titulaires(int compte_id, sqlite3 *bdd) {
 		// On trouve toutes les occurences de ce compte dans la table compte_titulaire et on ajoute les id des titulaires à la liste
 		int i;
 		for(i = 0 ; sqlite3_step(stmt) != SQLITE_DONE ; i++) liste_titulaires[i] = sqlite3_column_int(stmt,1);
+		sqlite3_finalize(stmt);
 	}
-	sqlite3_finalize(stmt);
 	return liste_titulaires;
 }
 // Pas de suppression titulaire (à moins que ? Juste le supprimer de tous ses comptes)
