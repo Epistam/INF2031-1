@@ -95,7 +95,7 @@ bool modifier_compte(Compte compte, int id, sqlite3 *bdd){
 	else return 0;
 }
 
-bool ajouter_compte_titulaire(int compte_id, int titulaire_id, sqlite3 *bdd){ // Dans métier proposer ajout titulaires séparés par séparateur à la création TODO
+bool ajouter_compte_titulaire(int compte_id, int titulaire_id, sqlite3 *bdd){ // Dans métier proposer ajout titulaires séparés par séparateur à la création TODO + TODO : TitulaireS ? Liste de titulaires à add 
 }
 bool enlever_compte_titulaire(int compte_id, int titulaire_id, sqlite3 *bdd){
 }
@@ -131,6 +131,31 @@ Compte *recup_compte(int compte_id, sqlite3 *bdd){
  *******************************/
 
 bool ajouter_titulaire(Titulaire titulaire, sqlite3 *bdd){
+
+	sqlite3_stmt *stmt;
+	sqlite3_prepare_v2(bdd, "INSERT INTO titulaires VALUES(NULL, ?, ?)", -1, &stmt, NULL);
+	sqlite3_bind_text(stmt, 1, titulaire.titulaire_nom, strlen(titulaire.titulaire_nom), NULL);
+	sqlite3_bind_text(stmt, 2, titulaire.titulaire_prenom, strlen(titulaire.titulaire_prenom), NULL);
+	
+	int res = sqlite3_step(stmt);
+	
+	sqlite3_finalize(stmt);
+	if(res != SQLITE_DONE) return -1;
+	else return 0;
+}
+bool modifier_titulaire(Titulaire titulaire, sqlite3 *bdd){
+	sqlite3_stmt *stmt;
+	sqlite3_prepare_v2(bdd, "UPDATE titulaires SET titulaire_nom = ?, titulaire_prenom = ? WHERE titulaire_id = ?", -1, &stmt, NULL);
+	sqlite3_bind_text(stmt, 1, titulaire.titulaire_nom, strlen(titulaire.titulaire_nom), NULL);
+	sqlite3_bind_text(stmt, 2, titulaire.titulaire_prenom, strlen(titulaire.titulaire_prenom), NULL);
+	sqlite3_bind_int(stmt, 3, titulaire.titulaire_id);
+
+	int res = sqlite3_step(stmt);
+
+	sqlite3_finalize(stmt);
+	if(res != SQLITE_DONE) return -1;
+	else return 0;
+
 }
 int *recup_titulaires(int compte_id, sqlite3 *bdd) {
 

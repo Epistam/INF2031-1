@@ -65,6 +65,7 @@ Compte *recup_compte(int compte_id, sqlite3 *bdd); // Id = 0 => on génère un c
  *******************************/
 
 bool ajouter_titulaire(Titulaire titulaire, sqlite3 *bdd);
+bool modifier_titulaire(Titulaire titulaire, sqlite3 *bdd);
 // Pas de suppression titulaire (à moins que ? Juste le supprimer de tous ses comptes)
 int *recup_titulaires(int compte_id, sqlite3 *bdd);
 #endif
