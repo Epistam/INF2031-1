@@ -11,6 +11,19 @@
 // Opérations sur les... opérations
 bool ajouter_operation(Operation op, sqlite3 *bdd){ // Penser à cast time_t à long long int
 
+	sqlite3_stmt *stmt;
+	sqlite3_prepare_v2(bdd, "INSERT INTO operations VALUES(NULL, ?, ?, ?, ?, ?, ?)", -1, &stmt, NULL);
+	sqlite3_bind_int(stmt, 1, op.operation_type);
+	sqlite3_bind_int(stmt, 2, (long long int)op.operation_date);
+	sqlite3_bind_int(stmt, 3, op.operation_expediteur);
+	sqlite3_bind_int(stmt, 4, op.operation_destinataire);
+	sqlite3_bind_double(stmt, 5, op.operation_montant);
+	
+	int res = sqlite3_step(stmt);
+	
+	sqlite3_finalize(stmt);
+	if(res != SQLITE_DONE) return -1;
+	else return 0;
 			
 
 	// free opeerartion ? en sortant du menu free la liste chaînée
