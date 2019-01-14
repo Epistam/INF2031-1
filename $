@@ -35,7 +35,7 @@ Operation *recup_operations(int compte_id, sqlite3 *bdd) {
 	Operation *op_origine, *op; 
 
 	// Préparation de la requête
-	sqlite3_prepare_v2(bdd, "SELECT * FROM operations WHERE operation_expediteur = ? OR operation_destinataire = ? ORDER BY operation_date", -1, &stmt, NULL);
+	sqlite3_prepare_v2(bdd, "SELECT * FROM comptes WHERE operation_expediteur = ? OR operation_destinaire ?	ORDER BY operation_date", -1, &stmt, NULL);
 	sqlite3_bind_int(stmt, 1, compte_id);
 	sqlite3_bind_int(stmt, 2, compte_id);
 
@@ -51,7 +51,6 @@ Operation *recup_operations(int compte_id, sqlite3 *bdd) {
 		op_origine->operation_date = (time_t)sqlite3_column_int(stmt,1);
 		op_origine->operation_expediteur = sqlite3_column_int(stmt,2);
 		op_origine->operation_destinataire = sqlite3_column_int(stmt,3);
-		op_origine->operation_montant = sqlite3_column_int(stmt,4);
 		op_origine->suivante = NULL; // Défini à NULL au cas où on rentre pas dans la boucle d'après
 	}
 	// Exécution de la requête : suite
@@ -59,11 +58,11 @@ Operation *recup_operations(int compte_id, sqlite3 *bdd) {
 	while(sqlite3_step(stmt) != SQLITE_DONE) {
 		op->suivante = malloc(sizeof(Operation)); // op et op_origine pointent tous deux sur le même objet à la première itération. Donc en assignant ici on change aussi op_origine->suivant
 		op = op->suivante;
+		
 		op->operation_id = sqlite3_column_int(stmt,0);
 		op->operation_date = sqlite3_column_int(stmt,1);
 		op->operation_expediteur = sqlite3_column_int(stmt,2);
 		op->operation_destinataire = sqlite3_column_int(stmt,3);
-		op->operation_montant = sqlite3_column_int(stmt,4);
 		op->suivante = NULL; // Défini à NULL au cas où on rentre pas dans l'itération d'après
 	}
 
@@ -142,16 +141,11 @@ Compte *recup_compte(int compte_id, sqlite3 *bdd){
 
 double recup_solde(int compte_id, time_t date, sqlite3 *bdd) {
 	double solde = 0;
-
-	Operation *op = recup_operations(compte_id, bdd); // On récupère toutes les opérations impliquant le compte
-
-	while(op != NULL && op->operation_date < date) { // Au cas où le compte n'a pas encore eu d'opération)
-		if(op->operation_expediteur == compte_id) solde -= op->operation_montant; // On soustrait si ce compte est l'expéditeur
-		if(op->operation_destinataire == compte_id) solde += op->operation_montant; // Et on additionne si c'est le destinataire
-		printf("%d, %lf\n",op->operation_id, op->operation_montant);
-		op = op->suivante;
+	Operation *op = recup_operations(compte_id, bdd);
+	while(op->suivante != NULL || op != NULL) { // Au cas où le compte n'a pas encore eu d'opération)
+		if(op->expediteur == compte_id) solde += operation->operation_montant;
+		if(op->expediteur == compte_id) solde += operation->operation_montant;
 	}
-	return solde;
 }
 
 /*******************************
