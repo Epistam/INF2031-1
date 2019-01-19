@@ -8,7 +8,7 @@
 /*****************************
  * Fonctions opérationnelles *
  *****************************/
-// Opérations sur les... opérations
+
 bool ajouter_operation(Operation op, sqlite3 *bdd){ // Penser à cast time_t à long long int
 
 	// Préparation requête
@@ -78,18 +78,26 @@ Operation *recup_operations(int compte_id, sqlite3 *bdd) {
 // Opérations basiques
 
 // Edition de compte
-bool ajouter_compte(Compte compte, sqlite3 *bdd){
-
+bool ajouter_compte(Compte *compte, sqlite3 *bdd){ // Donne l'id dans le compte créé
 	sqlite3_stmt *stmt;
 	sqlite3_prepare_v2(bdd, "INSERT INTO comptes VALUES(NULL, ?, ?)", -1, &stmt, NULL);
-	sqlite3_bind_int(stmt, 1, compte.compte_type);
+	sqlite3_bind_int(stmt, 1, compte->compte_type);
 	sqlite3_bind_int(stmt, 2, PERMISSION_DECOUVERT_DEFAUT);
 	
 	int res = sqlite3_step(stmt);
 	
 	sqlite3_finalize(stmt);
 	if(res != SQLITE_DONE) return -1;
-	else return 0;
+	else {
+		sqlite3_stmt *stmt2;
+		sqlite3_prepare_v2(bdd, "SELECT last_insert_rowid()", -1, &stmt2, NULL);
+		
+		int res2 = sqlite3_step(stmt2);
+		compte->compte_id = sqlite3_column_int(stmt2,0);
+		sqlite3_finalize(stmt2);
+
+		return 0;
+	}
 }
 
 bool modifier_compte(Compte compte, sqlite3 *bdd){
@@ -109,6 +117,18 @@ bool modifier_compte(Compte compte, sqlite3 *bdd){
 }
 
 bool ajouter_compte_titulaire(int compte_id, int titulaire_id, sqlite3 *bdd){ // Dans métier proposer ajout titulaires séparés par séparateur à la création TODO + TODO : TitulaireS ? Liste de titulaires à add 
+	
+	sqlite3_stmt *stmt;
+	sqlite3_prepare_v2(bdd, "INSERT INTO compte_titulaire VALUES(?, ?)", -1, &stmt, NULL);
+	sqlite3_bind_int(stmt, 1, compte_id);
+	sqlite3_bind_int(stmt, 2, titulaire_id);
+	
+	int res = sqlite3_step(stmt);
+	
+	sqlite3_finalize(stmt);
+	if(res != SQLITE_DONE) return -1;
+	else return 0;
+	
 }
 bool enlever_compte_titulaire(int compte_id, int titulaire_id, sqlite3 *bdd){
 }
@@ -148,7 +168,6 @@ double recup_solde(int compte_id, time_t date, sqlite3 *bdd) {
 	while(op != NULL && op->operation_date < date) { // Au cas où le compte n'a pas encore eu d'opération)
 		if(op->operation_expediteur == compte_id) solde -= op->operation_montant; // On soustrait si ce compte est l'expéditeur
 		if(op->operation_destinataire == compte_id) solde += op->operation_montant; // Et on additionne si c'est le destinataire
-		printf("%d, %lf\n",op->operation_id, op->operation_montant);
 		op = op->suivante;
 	}
 	return solde;
@@ -158,18 +177,27 @@ double recup_solde(int compte_id, time_t date, sqlite3 *bdd) {
  * Opérations sur le titulaire *
  *******************************/
 
-bool ajouter_titulaire(Titulaire titulaire, sqlite3 *bdd){
+bool ajouter_titulaire(Titulaire *titulaire, sqlite3 *bdd){
 
 	sqlite3_stmt *stmt;
 	sqlite3_prepare_v2(bdd, "INSERT INTO titulaires VALUES(NULL, ?, ?)", -1, &stmt, NULL);
-	sqlite3_bind_text(stmt, 1, titulaire.titulaire_nom, strlen(titulaire.titulaire_nom), NULL);
-	sqlite3_bind_text(stmt, 2, titulaire.titulaire_prenom, strlen(titulaire.titulaire_prenom), NULL);
+	sqlite3_bind_text(stmt, 1, titulaire->titulaire_nom, strlen(titulaire->titulaire_nom), NULL);
+	sqlite3_bind_text(stmt, 2, titulaire->titulaire_prenom, strlen(titulaire->titulaire_prenom), NULL);
 	
 	int res = sqlite3_step(stmt);
 	
 	sqlite3_finalize(stmt);
 	if(res != SQLITE_DONE) return -1;
-	else return 0;
+	else {
+		sqlite3_stmt *stmt2;
+		sqlite3_prepare_v2(bdd, "SELECT last_insert_rowid()", -1, &stmt2, NULL);
+		
+		int res2 = sqlite3_step(stmt2);
+		titulaire->titulaire_id = sqlite3_column_int(stmt2,0);
+		sqlite3_finalize(stmt2);
+
+		return 0;
+	}
 }
 bool modifier_titulaire(Titulaire titulaire, sqlite3 *bdd){
 	sqlite3_stmt *stmt;
@@ -226,6 +254,16 @@ int *recup_comptes_ids(int titulaire_id, int *comptes_nb, sqlite3 *bdd) {
 	
 	*comptes_nb = i;
 	return liste_comptes_ids;
+}
 
-	return comptes_nb;
+void recup_compte_types(sqlite3 *bdd) {
+
+	// On prépare la requête
+	sqlite3_stmt *stmt;
+	sqlite3_prepare_v2(bdd, "SELECT * FROM compte_type", -1, &stmt, NULL);
+	
+	// On trouve toutes les occurences de ce compte dans la table compte_titulaire et on ajoute les id des titulaires à la liste
+	while(sqlite3_step(stmt) != SQLITE_DONE) printf("%d : %s\n", sqlite3_column_int(stmt, 0), sqlite3_column_text(stmt,1)); // Grosse entorse à l'archi de l'application, mais au point où on en est... .
+	
+	sqlite3_finalize(stmt);
 }

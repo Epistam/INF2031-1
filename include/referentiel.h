@@ -51,7 +51,7 @@ Operation *recup_operations(int compte_id, sqlite3 *bdd);
  ****************************/
 
 // Edition de compte
-bool ajouter_compte(Compte compte, sqlite3 *bdd); // OK
+bool ajouter_compte(Compte *compte, sqlite3 *bdd); // OK
 bool modifier_compte(Compte compte, sqlite3 *bdd); // OK
 bool ajouter_compte_titulaire(int compte_id, int titulaire_id, sqlite3 *bdd);
 bool enlever_compte_titulaire(int compte_id, int titulaire_id, sqlite3 *bdd);
@@ -65,10 +65,13 @@ double recup_solde(int compte_id, time_t date, sqlite3 *bdd);
  * Opérations sur le titulaire *
  *******************************/
 
-bool ajouter_titulaire(Titulaire titulaire, sqlite3 *bdd); // OK
+bool ajouter_titulaire(Titulaire *titulaire, sqlite3 *bdd); // OK
 bool modifier_titulaire(Titulaire titulaire, sqlite3 *bdd); // OK
 // Pas de suppression titulaire (à moins que ? Juste le supprimer de tous ses comptes)
 int *recup_titulaires_ids(int compte_id, int *titulaires_nb, sqlite3 *bdd);
 int *recup_comptes_ids(int titulaire_id, int *comptes_nb, sqlite3 *bdd);
 //bool recherche_titulaire(); // TODO
+
+void recup_compte_types(sqlite3 *bdd);
+
 #endif
