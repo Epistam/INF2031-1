@@ -7,4 +7,4 @@ banqueadmin
 banquepub
 a.out
 *.bak
-bdd/*.bak
+bdd/*.bak*
