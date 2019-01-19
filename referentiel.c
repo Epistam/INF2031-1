@@ -28,6 +28,18 @@ bool ajouter_operation(Operation op, sqlite3 *bdd){ // Penser à cast time_t à 
 	else return 0;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
 Operation *recup_operations(int compte_id, sqlite3 *bdd) {
 
 	sqlite3_stmt *stmt;
@@ -71,6 +83,21 @@ Operation *recup_operations(int compte_id, sqlite3 *bdd) {
 	return op_origine; // On retourne un pointeur sur l'opération d'origine grâce à laquelle on pourra parcourir la liste chaînée
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /****************************
  * Opérations sur le compte *
  ****************************/
@@ -100,6 +127,21 @@ bool ajouter_compte(Compte *compte, sqlite3 *bdd){ // Donne l'id dans le compte 
 	}
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 bool modifier_compte(Compte compte, sqlite3 *bdd){
 	
 	sqlite3_stmt *stmt;
@@ -116,6 +158,23 @@ bool modifier_compte(Compte compte, sqlite3 *bdd){
 	else return 0;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 bool ajouter_compte_titulaire(int compte_id, int titulaire_id, sqlite3 *bdd){ // Dans métier proposer ajout titulaires séparés par séparateur à la création TODO + TODO : TitulaireS ? Liste de titulaires à add 
 	
 	sqlite3_stmt *stmt;
@@ -130,6 +189,18 @@ bool ajouter_compte_titulaire(int compte_id, int titulaire_id, sqlite3 *bdd){ //
 	else return 0;
 	
 }
+
+
+
+
+
+
+
+
+
+
+
+
 bool enlever_compte_titulaire(int compte_id, int titulaire_id, sqlite3 *bdd){
 }
 // bool supprimer_compte(int id){
@@ -160,18 +231,38 @@ Compte *recup_compte(int compte_id, sqlite3 *bdd){
 	return compte;
 }
 
-double recup_solde(int compte_id, time_t date, sqlite3 *bdd) {
-	double solde = 0;
 
-	Operation *op = recup_operations(compte_id, bdd); // On récupère toutes les opérations impliquant le compte
 
-	while(op != NULL && op->operation_date < date) { // Au cas où le compte n'a pas encore eu d'opération)
-		if(op->operation_expediteur == compte_id) solde -= op->operation_montant; // On soustrait si ce compte est l'expéditeur
-		if(op->operation_destinataire == compte_id) solde += op->operation_montant; // Et on additionne si c'est le destinataire
-		op = op->suivante;
-	}
-	return solde;
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /*******************************
  * Opérations sur le titulaire *
@@ -199,6 +290,18 @@ bool ajouter_titulaire(Titulaire *titulaire, sqlite3 *bdd){
 		return 0;
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
 bool modifier_titulaire(Titulaire titulaire, sqlite3 *bdd){
 	sqlite3_stmt *stmt;
 	sqlite3_prepare_v2(bdd, "UPDATE titulaires SET titulaire_nom = ?, titulaire_prenom = ? WHERE titulaire_id = ?", -1, &stmt, NULL);
@@ -213,6 +316,18 @@ bool modifier_titulaire(Titulaire titulaire, sqlite3 *bdd){
 	else return 0;
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
 int *recup_titulaires_ids(int compte_id, int *titulaires_nb, sqlite3 *bdd) { // Retourne la taille de l'array, et initizalize le pointeur passé en arg
 
 	int *liste_titulaires_ids = NULL;
@@ -234,6 +349,17 @@ int *recup_titulaires_ids(int compte_id, int *titulaires_nb, sqlite3 *bdd) { // 
 	*titulaires_nb = i;
 	return liste_titulaires_ids;
 }
+
+
+
+
+
+
+
+
+
+
+
 // Pas de suppression titulaire (à moins que ? Juste le supprimer de tous ses comptes)
 int *recup_comptes_ids(int titulaire_id, int *comptes_nb, sqlite3 *bdd) {
 	
@@ -255,6 +381,13 @@ int *recup_comptes_ids(int titulaire_id, int *comptes_nb, sqlite3 *bdd) {
 	*comptes_nb = i;
 	return liste_comptes_ids;
 }
+
+
+
+
+
+
+
 
 void recup_compte_types(sqlite3 *bdd) {
 

@@ -4,7 +4,7 @@
 #include <sqlite3.h>
 #include "include/referentiel.h"
 #include "include/metier.h"
-#include "include/interface_texte.h"
+#include "include/ihm_texte.h"
 
 #define STR_MAUVAIS_ARG "Veuillez sélectionner le mode dans lequel vous souhaitez exécuter cette application : './Banque graphique' ou './Banque texte'."
 

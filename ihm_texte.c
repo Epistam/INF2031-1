@@ -6,7 +6,7 @@
 #include <sqlite3.h>
 #include "include/referentiel.h"
 #include "include/metier.h"
-#include "include/interface_texte.h"
+#include "include/ihm_texte.h"
 
 int choix_interface(sqlite3 *bdd) {
 	int temp;
@@ -125,7 +125,7 @@ void text_run(sqlite3 *bdd) {
 			credit(bdd);
 			break;
 		case 4:
-			printf("%lf\n",recup_solde(id,time(NULL),bdd));
+			printf("%lf\n",calc_solde(id,time(NULL),bdd));
 			break;
 		}
         //} else printf("numero titulaire inconnu");

@@ -4,7 +4,7 @@
 #include <string.h>
 #include <sqlite3.h>
 #include "include/referentiel.h"
-#include "include/interface_graphique.h"
+#include "include/ihm_graphique.h"
 
 // Procédure (mode graphique) consistant en une boucle évènementielle rendant le programme interactif
 
