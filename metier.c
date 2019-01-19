@@ -42,15 +42,19 @@ double calc_solde(int compte_id, time_t date, sqlite3 *bdd) {
 	// Récupération de toutes les opérations impliquant le compte
 	Operation *op = recup_operations(compte_id, bdd); 
 
-	// On avance dans la liste chaînée des opérations en additionnant les soldes
-	while(op != NULL && op->operation_date < date) {
-		// On soustrait si ce compte est l'expéditeur
-		if(op->operation_expediteur == compte_id) solde -= op->operation_montant; 
-		// Et on additionne si c'est le destinataire
-		if(op->operation_destinataire == compte_id) solde += op->operation_montant; 
-		// Et on passe à l'opération suivante
-		op = op->suivante;
-	}
+	// Cas où il n'y a pas encore eu d'opérations sur le compte 
+	if(op == NULL) return 0;
+	else {
+		// On avance dans la liste chaînée des opérations en additionnant les soldes
+		while(op != NULL && op->operation_date < date) {
+			// On soustrait si ce compte est l'expéditeur
+			if(op->operation_expediteur == compte_id) solde -= op->operation_montant; 
+			// Et on additionne si c'est le destinataire
+			if(op->operation_destinataire == compte_id) solde += op->operation_montant; 
+			// Et on passe à l'opération suivante
+			op = op->suivante;
+		}
 
-	return solde;
+		return solde;
+	}
 }

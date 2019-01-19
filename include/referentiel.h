@@ -4,7 +4,7 @@
 #define MAX_TITULAIRES 10
 #define FICHIER_BDD "bdd/banque_test_set.db"
 //#define FICHIER_BDD "bdd/banque_vide.db"
-#define PERMISSION_DECOUVERT_DEFAUT 0 // Non
+#define PERMISSION_DECOUVERT_DEFAUT 0 // Autoriser ou pas le découvert à la création de compte
 
 /**************
  * Structures * 
@@ -38,7 +38,7 @@ typedef struct Operation_s {
 	time_t operation_date; // time_t est le type que retourne la "temps" de time.h. On castera cette valeur en long long int au moment de faire l'enregistrement BDD. 
 	unsigned int operation_expediteur;
 	unsigned int operation_destinataire;
-	double operation_montant; // Toujours positif, le sens est déterminé par l'identité de l'expéditeur et du destinataire
+	double operation_montant; // Toujours positif, le sens de la transaction est déterminé par l'identité de l'expéditeur et du destinataire
 	struct Operation_s *suivante;
 //	unsigned int operation_type; // Type 0 = echange liquidités, type 1 = virement // On ignore parce que virement avec un des 2 id 0 <=> échange liquidités
 } Operation;
@@ -48,35 +48,33 @@ typedef struct Operation_s {
  **************/
 
 bool ajouter_operation(Operation op, sqlite3 *bdd); // TEST OK
-Operation *recup_operations(int compte_id, sqlite3 *bdd); // TEST TODO
+Operation *recup_operations(int compte_id, sqlite3 *bdd); // TEST OK
 
-/****************************
- * Opérations sur le compte *
- ****************************/
+/**********
+ * Compte *
+ **********/
 
-// Edition de compte
-bool ajouter_compte(Compte *compte, sqlite3 *bdd); // OK
-bool modifier_compte(Compte compte, sqlite3 *bdd); // OK
-bool ajouter_compte_titulaire(int compte_id, int titulaire_id, sqlite3 *bdd);
-bool enlever_compte_titulaire(int compte_id, int titulaire_id, sqlite3 *bdd);
+// Ajoute un compte ET définit le nouveau numéro de compte dans la structure compte
+bool ajouter_compte(Compte *compte, sqlite3 *bdd); // TEST OK
+bool modifier_compte(Compte compte, sqlite3 *bdd); // TEST OK
+bool ajouter_compte_titulaire(int compte_id, int titulaire_id, sqlite3 *bdd); // TEST OK
+bool enlever_compte_titulaire(int compte_id, int titulaire_id, sqlite3 *bdd); // TEST OK
 // bool supprimer_compte(int id);
 
-// Récupération de données compte
-Compte *recup_compte(int compte_id, sqlite3 *bdd); // Id = 0 => on génère un compte vide
+// Récupère un compte (et le crée en mémoire pour traitement local).
+// Si on veut juste un compte vide, compte_id = 0.
+Compte *recup_compte(int compte_id, int *titulaires_nb, sqlite3 *bdd); // TEST OK
+int *recup_comptes_ids(int titulaire_id, int *comptes_nb, sqlite3 *bdd); // TEST OK
+char **recup_compte_types(int *types_nb, sqlite3 *bdd); // TEST OK
 
+/*************
+ * Titulaire *
+ *************/
 
-
-/*******************************
- * Opérations sur le titulaire *
- *******************************/
-
-bool ajouter_titulaire(Titulaire *titulaire, sqlite3 *bdd); // OK
-bool modifier_titulaire(Titulaire titulaire, sqlite3 *bdd); // OK
+bool ajouter_titulaire(Titulaire *titulaire, sqlite3 *bdd); // TEST OK
+bool modifier_titulaire(Titulaire titulaire, sqlite3 *bdd); // TEST OK
 // Pas de suppression titulaire (à moins que ? Juste le supprimer de tous ses comptes)
-int *recup_titulaires_ids(int compte_id, int *titulaires_nb, sqlite3 *bdd);
-int *recup_comptes_ids(int titulaire_id, int *comptes_nb, sqlite3 *bdd);
-//bool recherche_titulaire(); // TODO
-
-void recup_compte_types(sqlite3 *bdd);
+// recup_titulaires : useless pour l'instant
+int *recup_titulaires_ids(int compte_id, int *titulaires_nb, sqlite3 *bdd); // TEST OK
 
 #endif

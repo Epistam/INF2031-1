@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <sqlite3.h>
 #include "include/referentiel.h"
 #include "include/metier.h"
@@ -21,7 +22,32 @@ int main(int argc, char *argv[]) { // Récupération des arguments
 	sqlite3 *bdd;
 	sqlite3_open(FICHIER_BDD,&bdd);
 
-					text_run(bdd);
+/*					int titulaires_nb = malloc(sizeof(int));
+					int *titulaires_ids = recup_titulaires_ids(3, &titulaires_nb, bdd);
+					for(int i = 0 ; i < titulaires_nb ; i++) printf("%d,",titulaires_ids[i]);
+					puts("");*/
+
+/*
+
+					int *titulaires_nb = malloc(sizeof(int));
+					Compte *compte = recup_compte(3, titulaires_nb, bdd);
+					printf("Numéro de compte : %d\n",compte->compte_id);
+					printf("Type de compte : %d\n",compte->compte_type);
+					printf("Découvert autorisé ? %d\n",compte->compte_decouvert_autorise);
+					int i;
+					puts("Liste des titulaires : ");
+					for(i = 0 ; i < *titulaires_nb; i++) printf("%d,\n",compte->compte_titulaires[i]);
+					puts("");*/
+					
+					int *types_nb = malloc(sizeof(int));
+					char **types = recup_compte_types(types_nb, bdd);
+					int i;
+					for(i = 0 ; i < *types_nb ;i++) printf("%s\n",types[i]);
+
+					//text_run(bdd);
+					//enlever_compte_titulaire(7, 10, bdd);
+
+
 					// Récup titulaires d'un compte
 					/*
 					int *titulaire_ids = NULL;
@@ -49,18 +75,14 @@ int main(int argc, char *argv[]) { // Récupération des arguments
 						op->operation_montant = 69.0;
 					*/
 					// Test ajouter + modifie rcompte
-					/*
+				/*	
 						Titulaire *titulaire = malloc(sizeof(Titulaire));
-						//titulaire->titulaire_id = ;
-						titulaire->titulaire_nom = strdup("Adolf");
-						titulaire->titulaire_prenom = strdup("Hittlehair");
-
-						printf("%d",ajouter_titulaire(*titulaire, bdd));
 						
-						titulaire->titulaire_id = 1;
-						titulaire->titulaire_nom = strdup("Adolf");
-						titulaire->titulaire_prenom = strdup("MeinKampf");
+						titulaire->titulaire_nom = strdup("Test");
+						titulaire->titulaire_prenom = strdup("Test");
 
+						ajouter_titulaire(titulaire, bdd);
+						printf("%d",titulaire->titulaire_id);						
 						printf("%d",modifier_titulaire(*titulaire, bdd));
 					*/
 					// Test modifier_compte
