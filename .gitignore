@@ -2,5 +2,9 @@
 *.swp
 .vim.session
 meta/*
-Banque
+test.c
+banqueadmin
+banquepub
 a.out
+*.bak
+bdd/*.bak
